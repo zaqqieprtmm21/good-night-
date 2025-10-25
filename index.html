@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selamat Tidur, Sayang</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --moon:#f6f3d1;
+      --accent:#ff6b9a;
+      --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(ellipse at 20% 10%, #112, transparent 30%), linear-gradient(180deg,#07122b 0%, var(--bg) 60%);
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .card{
+      width:min(820px,96vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:18px;
+      padding:28px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* stars */
+    .starfield{position:absolute;inset:0;pointer-events:none}
+    .star{width:2px;height:2px;background:#fff;border-radius:50%;position:absolute;opacity:0.9;transform:translateZ(0);animation:twinkle 3s infinite ease-in-out}
+    @keyframes twinkle{0%{opacity:0.2}50%{opacity:1}100%{opacity:0.2}}
+
+    .moon{
+      position:absolute;right:28px;top:20px;width:110px;height:110px;border-radius:50%;background:var(--moon);
+      box-shadow: inset -18px -12px 0 rgba(0,0,0,0.12), 0 6px 30px rgba(0,0,0,0.4);
+      filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5));
+    }
+    .crater{position:absolute;border-radius:50%;background:rgba(0,0,0,0.06)}
+    .crater.c1{width:22px;height:22px;left:22px;top:24px}
+    .crater.c2{width:14px;height:14px;left:58px;top:46px}
+    .crater.c3{width:18px;height:18px;left:36px;top:68px}
+
+    .content{
+      position:relative;z-index:4;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:center;
+    }
+    h1{margin:0 0 8px 0;font-size:28px;letter-spacing:0.4px}
+    p.lead{margin:0 0 18px 0;opacity:0.95}
+
+    .note{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .heart{
+      width:120px;height:120px;margin:0 auto;display:flex;align-items:center;justify-content:center;flex-direction:column;
+    }
+    .heart .icon{width:64px;height:64px;position:relative}
+    .heart .icon:before, .heart .icon:after{
+      content:'';position:absolute;left:32px;top:0;width:32px;height:48px;background:var(--accent);border-radius:18px 18px 0 0;transform-origin:0 100%;
+    }
+    .heart .icon:before{transform:rotate(-45deg);left:16px}
+    .heart .icon:after{transform:rotate(45deg);left:48px}
+    .heart .pulse{margin-top:12px;font-weight:700;color:var(--accent);animation:pulse 1.6s infinite}
+    @keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:0.9}100%{transform:scale(1);opacity:1}}
+
+    .controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
+    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff9ab8);color:#2b0722;font-weight:700}
+
+    footer{margin-top:18px;text-align:center;opacity:0.8}
+
+    /* responsive */
+    @media (max-width:780px){
+      .content{grid-template-columns:1fr}
+      .moon{right:14px;top:8px;width:80px;height:80px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <div class="starfield" id="stars"></div>
+    <div class="moon" aria-hidden="true">
+      <div class="crater c1"></div>
+      <div class="crater c2"></div>
+      <div class="crater c3"></div>
+    </div>
+
+    <div class="content">
+      <div>
+        <h1 id="title">Selamat Tidur, Sayang 🌙</h1>
+        <p class="lead" id="subtitle">Semoga mimpimu manis dan besok bangun dengan senyum. Aku selalu mendoakan yang terbaik untukmu.</p>
+
+        <div class="note">
+          <p style="margin:0 0 8px 0">Pesan khusus:</p>
+          <p id="customMsg" style="margin:0;">jangan lupa baca doa sebelum tidur sayang love u .</p>
+
+          <div class="controls">
+            <button class="btn" onclick="editMessage()">Edit Pesan</button>
+            <button class="btn primary" onclick="surprise()">Kirim Kejutan</button>
+          </div>
+        </div>
+
+        <footer>
+          <small>Halaman ini dibuat dengan penuh cinta 💖</small>
+        </footer>
+      </div>
+
+      <div class="heart">
+        <div class="icon" aria-hidden="true"></div>
+        <div class="pulse">Aku sayang kamu</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // generate stars
+    const starfield = document.getElementById('stars');
+    for(let i=0;i<60;i++){
+      const s = document.createElement('div');
+      s.className='star';
+      const x = Math.random()*100;
+      const y = Math.random()*100;
+      const size = Math.random()*2+1;
+      s.style.left = x+'%';
+      s.style.top = y+'%';
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.animationDuration = (2+Math.random()*3)+'s';
+      s.style.opacity = (0.4+Math.random()*0.9).toString();
+      starfield.appendChild(s);
+    }
+
+    // personalize: prompt for name on first load (optional)
+    const title = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
+    const customMsg = document.getElementById('customMsg');
+
+    function editMessage(){
+      const newMsg = prompt('Tulis pesan selamat tidur untuk pacar kamu:', customMsg.innerText);
+      if(newMsg!==null){
+        customMsg.innerText = newMsg;
+      }
+    }
+
+    function surprise(){
+      // simple temporary "kejut" effect: change background and show emoji
+      const old = document.body.style.background;
+      document.body.style.transition='background 0.8s';
+      document.body.style.background = 'linear-gradient(180deg,#0b1220,#1a0524)';
+      alert('Kejutan! 🌟 Pesan telah dikirim ke hatinya — semoga membuatnya tersenyum :)');
+      setTimeout(()=>{document.body.style.background='';},700);
+    }
+
+    // Optionally allow setting a name from URL parameter ?to=Nama
+    const params = new URLSearchParams(location.search);
+    const to = params.get('to');
+    if(to){
+      title.innerText = 'Selamat Tidur, ' + decodeURIComponent(to) + ' 🌙';
+      subtitle.innerText = 'Semoga mimpimu manis, ' + decodeURIComponent(to) + '. Aku sayang kamu.';
+    }
+  </script>
+</body>
+</html>
